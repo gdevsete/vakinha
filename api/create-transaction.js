@@ -13,13 +13,13 @@ export default async function handler(req, res) {
 
     const auth = 'Basic ' + Buffer.from(publicKey + ':' + secretKey).toString('base64');
 
-    // PodPay may expect amount in reais (e.g. 15.00) or in cents depending on the plan.
-    // Normalize: if the incoming amount seems to be in cents (>=1000), convert to reais.
-    const normalizedAmount = amount >= 1000 ? (amount / 100) : amount;
+    // The client sends `amount` in cents (e.g. R$15.00 -> 1500). We'll forward amounts in cents
+    // to PodPay (many APIs expect integer cents) and include items.unit_amount in cents.
+    const amountInCents = amount;
 
     // Build payload including required `items` field (PodPay requires an items list)
     const payload = {
-      amount: normalizedAmount,
+      amount: amountInCents,
       paymentMethod: 'pix',
       currency: 'BRL',
       description: 'Doação - Vakinha dos Bastiões',
@@ -27,8 +27,7 @@ export default async function handler(req, res) {
         {
           name: 'Doação',
           quantity: 1,
-          // many payment APIs accept unit price in the currency unit (reais). If PodPay expects cents, adjust accordingly.
-          unit_amount: normalizedAmount,
+          unit_amount: amountInCents,
         },
       ],
       customer: body.customer || undefined,

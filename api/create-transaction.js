@@ -25,9 +25,12 @@ export default async function handler(req, res) {
       description: 'Doação - Vakinha dos Bastiões',
       items: [
         {
-          name: 'Doação',
+          // PodPay requires these fields: title, unitPrice and tangible
+          title: 'Doação',
           quantity: 1,
-          unit_amount: amountInCents,
+          // unitPrice in cents (integer)
+          unitPrice: amountInCents,
+          tangible: false,
         },
       ],
       customer: body.customer || undefined,

@@ -13,11 +13,17 @@ export default async function handler(req, res) {
 
     const auth = 'Basic ' + Buffer.from(publicKey + ':' + secretKey).toString('base64');
 
+    // PodPay may expect amount in reais (e.g. 15.00) or in cents depending on the plan.
+    // Normalize: if the incoming amount seems to be in cents (>=1000), convert to reais.
+    const normalizedAmount = amount >= 1000 ? (amount / 100) : amount;
+
     const payload = {
-      amount: amount,
+      amount: normalizedAmount,
       paymentMethod: 'pix',
       customer: body.customer || undefined,
     };
+
+    console.log('create-transaction payload ->', JSON.stringify(payload));
 
     const resp = await fetch('https://api.podpay.pro/v1/transactions', {
       method: 'POST',
@@ -28,8 +34,15 @@ export default async function handler(req, res) {
       body: JSON.stringify(payload),
     });
 
-    const data = await resp.json();
-    if (!resp.ok) return res.status(resp.status).json({ error: data.message || data });
+    const data = await resp.json().catch((e) => ({ parseError: String(e) }));
+    console.log('create-transaction response status', resp.status, 'body ->', JSON.stringify(data));
+
+    if (!resp.ok) {
+      // Return detailed error for debugging (safe because this is server-side log),
+      // but send a friendly message to the client as well.
+      const errMsg = data.message || data.error || JSON.stringify(data);
+      return res.status(resp.status).json({ error: errMsg });
+    }
 
     return res.status(200).json(data);
   } catch (err) {

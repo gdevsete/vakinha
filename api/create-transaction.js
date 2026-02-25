@@ -1,0 +1,39 @@
+export default async function handler(req, res) {
+  try {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    const body = req.body;
+    if (!body || typeof body.amount !== 'number') return res.status(400).json({ error: 'Invalid payload' });
+
+    const amount = body.amount;
+    if (amount < 1200) return res.status(400).json({ error: 'Minimum amount is 1200 (R$12.00)' });
+
+    const publicKey = process.env.PODPAY_PUBLIC;
+    const secretKey = process.env.PODPAY_SECRET;
+    if (!publicKey || !secretKey) return res.status(500).json({ error: 'PodPay keys not configured on server.' });
+
+    const auth = 'Basic ' + Buffer.from(publicKey + ':' + secretKey).toString('base64');
+
+    const payload = {
+      amount: amount,
+      paymentMethod: 'pix',
+      customer: body.customer || undefined,
+    };
+
+    const resp = await fetch('https://api.podpay.pro/v1/transactions', {
+      method: 'POST',
+      headers: {
+        Authorization: auth,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await resp.json();
+    if (!resp.ok) return res.status(resp.status).json({ error: data.message || data });
+
+    return res.status(200).json(data);
+  } catch (err) {
+    console.error('create-transaction error', err);
+    return res.status(500).json({ error: String(err) });
+  }
+}

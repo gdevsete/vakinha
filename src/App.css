@@ -232,6 +232,27 @@ html, body {
 
 .thanks-actions .btn { padding: 8px 12px; }
 
+/* Modal adjustments for small screens */
+.contribuir-modal { max-height: 90vh; overflow: auto; }
+.thanks-modal { max-height: 70vh; overflow-y: auto; }
+
+@media (max-width: 520px) {
+  .contribuir-modal { width: 360px; padding: 12px; border-radius: 10px; }
+  .thanks-qr img { max-width: 180px; }
+  .thanks-qr-text input { font-size: 13px; padding: 8px; }
+  .thanks-actions { flex-wrap: wrap; gap: 8px; }
+  .thanks-actions .btn { flex: 1 1 100%; padding: 10px; }
+}
+
+@media (max-width: 380px) {
+  .contribuir-modal { width: 320px; padding: 10px; }
+  .thanks-qr img { max-width: 140px; }
+  .thanks-actions .btn { font-size: 14px; }
+}
+
+.thanks-qr-text { margin: 8px 0 12px; }
+.thanks-qr-text .btn { align-self: center; }
+
 @media (max-width: 520px) {
   .contribuir-modal { padding:14px; }
   .contribuir-header h3 { font-size:1.05rem; }

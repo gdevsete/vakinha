@@ -100,6 +100,7 @@ function ContribuirModal({ onClose }) {
   const [result, setResult] = useState(null);
   const [showThanks, setShowThanks] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState(null);
+  const [pixPayload, setPixPayload] = useState('');
 
   const minimum = 12;
 
@@ -152,10 +153,14 @@ function ContribuirModal({ onClose }) {
         setError(data.error || JSON.stringify(data));
       } else {
         setResult(data);
+        // Extrair o payload Pix a partir de possíveis campos retornados pela API
+        const possiblePix = data && data.pix ? data.pix : {};
+        const payloadString = possiblePix.qrcode || possiblePix.payload || possiblePix.copyPaste || possiblePix.copy_paste || possiblePix.text || possiblePix.qr || '';
+        setPixPayload(payloadString || '');
         // gerar QR Code data URL a partir do payload Pix, se disponível
-        if (data && data.pix && data.pix.qrcode) {
+        if (payloadString) {
           try {
-            const url = await QRCode.toDataURL(data.pix.qrcode);
+            const url = await QRCode.toDataURL(payloadString);
             setQrDataUrl(url);
           } catch (err) {
             console.warn('QR generation failed', err);
@@ -230,10 +235,15 @@ function ContribuirModal({ onClose }) {
               )}
 
               <div className="thanks-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => { setShowThanks(false); setResult(null); setQrDataUrl(null); }}>Fechar</button>
-                <button type="button" className="btn btn-primary" onClick={() => { navigator.clipboard?.writeText(result?.pix?.qrcode || ''); }}>
+                <button type="button" className="btn btn-secondary" onClick={() => { setShowThanks(false); setResult(null); setQrDataUrl(null); setPixPayload(''); }}>Fechar</button>
+                <button type="button" className="btn btn-primary" onClick={() => { navigator.clipboard?.writeText(pixPayload || ''); }}>
                   Copiar código Pix
                 </button>
+                {result?.secureUrl && (
+                  <button type="button" className="btn" onClick={() => window.open(result.secureUrl, '_blank')}>
+                    Abrir link de pagamento
+                  </button>
+                )}
                 <button type="button" className="btn" onClick={() => { navigator.clipboard?.writeText(JSON.stringify(result)); }}>
                   Copiar dados do pagamento
                 </button>

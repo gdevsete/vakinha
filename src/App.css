@@ -227,6 +227,11 @@ html, body {
 .thanks-modal p { margin:0 0 10px 0; color:#444; }
 .thanks-actions { display:flex; gap:8px; justify-content:flex-end; margin-bottom:8px; }
 
+.thanks-qr { text-align: center; margin: 10px 0; }
+.thanks-qr img { max-width: 240px; width: 100%; height: auto; border-radius: 8px; padding: 8px; background: #fff; border: 1px solid #e6f8ea; box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
+
+.thanks-actions .btn { padding: 8px 12px; }
+
 @media (max-width: 520px) {
   .contribuir-modal { padding:14px; }
   .contribuir-header h3 { font-size:1.05rem; }

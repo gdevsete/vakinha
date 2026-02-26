@@ -1,7 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import Header from './Header';
+import QRCode from 'qrcode';
 
 const TABS = [
   'Sobre',
@@ -98,6 +99,7 @@ function ContribuirModal({ onClose }) {
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
   const [showThanks, setShowThanks] = useState(false);
+  const [qrDataUrl, setQrDataUrl] = useState(null);
 
   const minimum = 12;
 
@@ -137,6 +139,18 @@ function ContribuirModal({ onClose }) {
         setError(data.error || JSON.stringify(data));
       } else {
         setResult(data);
+        // gerar QR Code data URL a partir do payload Pix, se disponível
+        if (data && data.pix && data.pix.qrcode) {
+          try {
+            const url = await QRCode.toDataURL(data.pix.qrcode);
+            setQrDataUrl(url);
+          } catch (err) {
+            console.warn('QR generation failed', err);
+            setQrDataUrl(null);
+          }
+        } else {
+          setQrDataUrl(null);
+        }
         setShowThanks(true);
       }
     } catch (err) {
@@ -195,12 +209,23 @@ function ContribuirModal({ onClose }) {
             <div className="thanks-modal">
               <h4>Obrigado — você está ajudando muito</h4>
               <p>Sua contribuição faz diferença agora. Com sua doação famílias afetadas pelas enchentes terão abrigo, comida e esperança.</p>
+
+              {qrDataUrl && (
+                <div className="thanks-qr">
+                  <img src={qrDataUrl} alt="QR Pix" />
+                </div>
+              )}
+
               <div className="thanks-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => { setShowThanks(false); setResult(null); }}>Fechar</button>
-                <button type="button" className="btn btn-primary" onClick={() => { navigator.clipboard?.writeText(JSON.stringify(result)); }}>
+                <button type="button" className="btn btn-secondary" onClick={() => { setShowThanks(false); setResult(null); setQrDataUrl(null); }}>Fechar</button>
+                <button type="button" className="btn btn-primary" onClick={() => { navigator.clipboard?.writeText(result?.pix?.qrcode || ''); }}>
+                  Copiar código Pix
+                </button>
+                <button type="button" className="btn" onClick={() => { navigator.clipboard?.writeText(JSON.stringify(result)); }}>
                   Copiar dados do pagamento
                 </button>
               </div>
+
               <pre className="result-json">{JSON.stringify(result, null, 2)}</pre>
             </div>
           )}

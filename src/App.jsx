@@ -103,6 +103,13 @@ function ContribuirModal({ onClose }) {
 
   const minimum = 12;
 
+  const isValidEmail = (em) => {
+    if (!em) return true; // empty allowed (optional)
+    const s = String(em).trim();
+    const re = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    return re.test(s);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -111,6 +118,12 @@ function ContribuirModal({ onClose }) {
     const numeric = parseFloat(String(amount).replace(/[^0-9.,]/g, '').replace(',', '.')) || 0;
     if (numeric < minimum) {
       setError(`Valor mínimo de R$ ${minimum},00`);
+      return;
+    }
+
+    // validate email before sending to PodPay (provider rejects malformed emails)
+    if (email && !isValidEmail(email)) {
+      setError('E-mail inválido. Verifique e tente novamente.');
       return;
     }
 

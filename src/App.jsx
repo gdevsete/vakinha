@@ -156,6 +156,7 @@ function ContribuirModal({ onClose }) {
         // Extrair o payload Pix a partir de possíveis campos retornados pela API
         const possiblePix = data && data.pix ? data.pix : {};
         const payloadString = possiblePix.qrcode || possiblePix.payload || possiblePix.copyPaste || possiblePix.copy_paste || possiblePix.text || possiblePix.qr || '';
+        console.debug('create response pix payloadString:', payloadString);
         setPixPayload(payloadString || '');
         // gerar QR Code data URL a partir do payload Pix, se disponível
         if (payloadString) {
@@ -251,6 +252,17 @@ function ContribuirModal({ onClose }) {
               {qrDataUrl && (
                 <div className="thanks-qr">
                   <img src={qrDataUrl} alt="QR Pix" />
+                </div>
+              )}
+
+              {/* fallback: mostrar payload Pix em campo copiável caso a imagem não exista */}
+              {!qrDataUrl && pixPayload && (
+                <div className="thanks-qr-text">
+                  <label style={{display:'block', marginBottom:6}}>Código Pix (copiar/colar)</label>
+                  <div style={{display:'flex', gap:8}}>
+                    <input readOnly value={pixPayload} style={{flex:1, padding:'8px', borderRadius:6, border:'1px solid #e6e6e6', background:'#fff'}} />
+                    <button type="button" className="btn btn-primary" onClick={() => { navigator.clipboard?.writeText(pixPayload || ''); }}>Copiar</button>
+                  </div>
                 </div>
               )}
 

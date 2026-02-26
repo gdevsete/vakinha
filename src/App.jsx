@@ -101,6 +101,7 @@ function ContribuirModal({ onClose }) {
   const [showThanks, setShowThanks] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState(null);
   const [pixPayload, setPixPayload] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const minimum = 12;
 
@@ -273,28 +274,34 @@ function ContribuirModal({ onClose }) {
               )}
 
               <div className="thanks-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => { setShowThanks(false); setResult(null); setQrDataUrl(null); setPixPayload(''); }}>Fechar</button>
-                <button type="button" className="btn btn-primary" onClick={() => { navigator.clipboard?.writeText(pixPayload || ''); }}>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={async () => {
+                    const text = pixPayload || result?.pix?.qrcode || '';
+                    try {
+                      await navigator.clipboard.writeText(text);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    } catch (e) {
+                      console.warn('copy failed', e);
+                    }
+                  }}
+                >
                   Copiar código Pix
                 </button>
-                {result?.secureUrl && (
-                  <button type="button" className="btn" onClick={() => window.open(result.secureUrl, '_blank')}>
-                    Abrir link de pagamento
-                  </button>
-                )}
-                <button type="button" className="btn" onClick={() => { navigator.clipboard?.writeText(JSON.stringify(result)); }}>
-                  Copiar dados do pagamento
-                </button>
+                {copied && <span className="copied-badge">Copiado!</span>}
               </div>
 
               {/* JSON de debug removido: exibir apenas o QR e o campo para copiar o Pix */}
             </div>
           )}
 
-          <div className="contribuir-actions">
-            <button type="button" className="btn btn-secondary" onClick={onClose}>Fechar</button>
-            <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? 'Gerando...' : 'Gerar Pix'}</button>
-          </div>
+          {! (result && qrDataUrl) && (
+            <div className="contribuir-actions">
+              <button type="submit" className="btn btn-primary" disabled={loading}>{loading ? 'Gerando...' : 'Gerar Pix'}</button>
+            </div>
+          )}
         </form>
       </div>
     </div>

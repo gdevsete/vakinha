@@ -253,6 +253,8 @@ html, body {
 .thanks-qr-text { margin: 8px 0 12px; }
 .thanks-qr-text .btn { align-self: center; }
 
+.copied-badge { margin-left: 8px; background:#16c172; color:#fff; padding:4px 8px; border-radius:12px; font-size:12px; display:inline-block; vertical-align:middle; }
+
 @media (max-width: 520px) {
   .contribuir-modal { padding:14px; }
   .contribuir-header h3 { font-size:1.05rem; }

@@ -1,8 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import Header from './Header';
-import QRCode from 'qrcode';
+import { toDataURL } from 'qrcode';
 
 const TABS = [
   'Sobre',
@@ -160,7 +160,7 @@ function ContribuirModal({ onClose }) {
         // gerar QR Code data URL a partir do payload Pix, se disponível
         if (payloadString) {
           try {
-            const url = await QRCode.toDataURL(payloadString);
+            const url = await toDataURL(payloadString);
             setQrDataUrl(url);
           } catch (err) {
             console.warn('QR generation failed', err);
@@ -176,7 +176,7 @@ function ContribuirModal({ onClose }) {
               if (p) {
                 setPixPayload(p);
                 try {
-                  const url2 = await QRCode.toDataURL(p);
+                  const url2 = await toDataURL(p);
                   setQrDataUrl(url2);
                 } catch (err) {
                   console.warn('QR generation from fetched tx failed', err);
@@ -187,6 +187,8 @@ function ContribuirModal({ onClose }) {
           } catch (err) {
             console.warn('fetch transaction failed', err);
           }
+        }
+        // mostrar modal de agradecimento após tentativas de extrair o payload/QR
         setShowThanks(true);
       }
     } catch (err) {

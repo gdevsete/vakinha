@@ -167,6 +167,27 @@ function ContribuirModal({ onClose }) {
             setQrDataUrl(null);
           }
         } else {
+          // tentar buscar a transação diretamente no servidor (caso o payload Pix não venha no create response)
+          try {
+            const txResp = await fetch(`/api/get-transaction?id=${data.id}`);
+            if (txResp.ok) {
+              const tx = await txResp.json();
+              const p = tx?.pix?.qrcode || tx?.pix?.payload || tx?.pix?.copyPaste || tx?.pix?.copy_paste || '';
+              if (p) {
+                setPixPayload(p);
+                try {
+                  const url2 = await QRCode.toDataURL(p);
+                  setQrDataUrl(url2);
+                } catch (err) {
+                  console.warn('QR generation from fetched tx failed', err);
+                  setQrDataUrl(null);
+                }
+              }
+            }
+          } catch (err) {
+            console.warn('fetch transaction failed', err);
+          }
+        } else {
           setQrDataUrl(null);
         }
         setShowThanks(true);

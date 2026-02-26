@@ -287,7 +287,7 @@ function ContribuirModal({ onClose }) {
                 </button>
               </div>
 
-              <pre className="result-json">{JSON.stringify(result, null, 2)}</pre>
+              {/* JSON de debug removido: exibir apenas o QR e o campo para copiar o Pix */}
             </div>
           )}
 

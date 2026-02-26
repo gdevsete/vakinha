@@ -162,10 +162,13 @@ function ContribuirModal({ onClose }) {
         if (payloadString) {
           try {
             const url = await toDataURL(payloadString);
+            console.debug('qr generated (dataURL) len=', url?.length);
             setQrDataUrl(url);
           } catch (err) {
-            console.warn('QR generation failed', err);
-            setQrDataUrl(null);
+            console.warn('QR generation failed, falling back to external API', err);
+            const fallback = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(payloadString)}&size=240x240`;
+            console.debug('qr fallback url=', fallback);
+            setQrDataUrl(fallback);
           }
         } else {
           // tentar buscar a transação diretamente no servidor (caso o payload Pix não venha no create response)
@@ -178,10 +181,13 @@ function ContribuirModal({ onClose }) {
                 setPixPayload(p);
                 try {
                   const url2 = await toDataURL(p);
+                  console.debug('qr generated from fetched tx (dataURL) len=', url2?.length);
                   setQrDataUrl(url2);
                 } catch (err) {
-                  console.warn('QR generation from fetched tx failed', err);
-                  setQrDataUrl(null);
+                  console.warn('QR generation from fetched tx failed, using fallback', err);
+                  const fallback2 = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(p)}&size=240x240`;
+                  console.debug('qr fallback2=', fallback2);
+                  setQrDataUrl(fallback2);
                 }
               }
             }

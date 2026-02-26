@@ -187,9 +187,6 @@ function ContribuirModal({ onClose }) {
           } catch (err) {
             console.warn('fetch transaction failed', err);
           }
-        } else {
-          setQrDataUrl(null);
-        }
         setShowThanks(true);
       }
     } catch (err) {

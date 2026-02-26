@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import './App.css';
 import Header from './Header';
 import { toDataURL } from 'qrcode';
+import bannerImg from './assets/imagem1.webp';
+import shieldImg from './assets/7026241.png';
 
 const TABS = [
   'Sobre',
@@ -31,7 +33,7 @@ export default function App() {
         <div className="vakinha-col-left">
           <div className="vakinha-img-box">
             <img
-              src="/src/assets/imagem1.webp"
+              src={bannerImg}
               alt="Vakinha dos Bastiões - enchente"
               className="vakinha-banner-img"
             />
@@ -70,7 +72,7 @@ export default function App() {
             <button className="vakinha-btn-compartilhar-ref">Compartilhar</button>
             <div className="vakinha-protegida-ref">
               <span className="vakinha-protegida-escudo">
-                <img src="/src/assets/7026241.png" alt="Escudo Protegido" className="vakinha-protegida-escudo-img" />
+                <img src={shieldImg} alt="Escudo Protegido" className="vakinha-protegida-escudo-img" />
               </span>
               <span className="vakinha-protegida-text">DOAÇÃO PROTEGIDA</span>
             </div>
